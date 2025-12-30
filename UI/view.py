@@ -32,7 +32,10 @@ class View:
         # TODO
 
         # Riga 1
-        self.dd_anno = ft.Dropdown(label="Anno", width=200, alignment=ft.alignment.top_left)
+        self.dd_anno = ft.Dropdown(label="Anno", width=200, alignment=ft.alignment.top_left,
+                                   on_change=self.controller.dropdown_changed,
+                                   enable_search=True)
+        self.controller.popola_dropdown()
 
         row1 = ft.Row([ft.Container(self.txt_titolo, width=500),
                                ft.Container(None, width=0),
