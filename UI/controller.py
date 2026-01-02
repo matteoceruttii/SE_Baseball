@@ -46,14 +46,38 @@ class Controller:
         self._view.txt_risultato.clean()
         utente = self._view.dd_squadra.value
         connessi = self._model.connessi(utente)
+        connessi.sort(key=lambda connesso: connesso.somma_salario, reverse=True)
         for connesso in connessi:
-            print(connesso)
-            self._view.txt_risultato.controls.append(ft.Text(f"{connesso.team_code} ({connesso.name}) - peso: "))
+            self._view.txt_risultato.controls.append(ft.Text(f"{connesso.team_code} ({connesso.name}) - peso: {connesso.somma_salario}"))
         self._view.update()
 
 
 # D) funzione di handler che gestisce il percorso
     def handle_percorso(self, e):
         """ Handler per gestire il problema ricorsivo di ricerca del percorso """""
+        if not self._view.dd_squadra.value:
+            self._view.show_alert("Selezionare una squadra")
+            return
+        try:
+            for squadra in self._lista_squadre:
+                if squadra.team_code == self._view.dd_squadra.value:
+                    nodo_partenza = squadra
+                    max_salario = squadra.somma_salario
+        except ValueError:
+            self._view.show_alert("Inserire un valore valido")
+            return
+
+        best_set = self._model.compute_best_set(nodo_partenza, max_salario)
+
+        total_salario = sum(a.somma_salario for a in best_set)
         self._view.txt_risultato.clean()
+
+        # aggiungo prima i vari passaggi
+        for a in best_set:
+            self._view.txt_risultato.controls.append(ft.Text(f"- {a.team_code} ({a.name:.2f}) -> "))
+
+        # restituisco il peso totale
+        self._view.txt_risultato.controls.append(
+            ft.Text(f"Peso totale : {total_salario:.2f}")
+        )
         self._view.update()
